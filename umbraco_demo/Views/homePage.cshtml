@@ -1,0 +1,876 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Cms.Core.Models.PublishedContent;
+@using Umbraco.Extensions;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = null;
+    var pageTitle = Model.Value<string>("pageTitle");
+    var metaDescription = Model.Value<string>("metaDescription");
+    var metaKeywords = Model.Value<string>("metaKeywords");
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@(string.IsNullOrEmpty(pageTitle) ? Model.Name : pageTitle)</title>
+    @if (!string.IsNullOrEmpty(metaDescription))
+    {
+        <meta name="description" content="@metaDescription">
+    }
+    @if (!string.IsNullOrEmpty(metaKeywords))
+    {
+        <meta name="keywords" content="@metaKeywords">
+    }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+        
+        .cta-button {
+            background: white;
+            color: #6366f1;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #6366f1;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            padding: 15px 30px;
+            border: 2px solid white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: #6366f1;
+        }
+        
+        /* Dashboard Preview */
+        .dashboard-preview {
+            margin-top: 60px;
+            position: relative;
+        }
+        
+        .dashboard-image {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            margin: 0 auto;
+            display: block;
+        }
+        
+        /* Brands Section */
+        .brands {
+            padding: 80px 0;
+            background: #f8fafc;
+            text-align: center;
+        }
+        
+        .brands h3 {
+            color: #64748b;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        
+        .brand-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            opacity: 0.6;
+        }
+        
+        .brand-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #64748b;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 120px 0;
+        }
+        
+        .feature {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            margin-bottom: 120px;
+        }
+        
+        .feature:nth-child(even) .feature-content {
+            order: 2;
+        }
+        
+        .feature:nth-child(even) .feature-image {
+            order: 1;
+        }
+        
+        .feature-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+        
+        .feature-content p {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+        
+        .feature-image {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .feature-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 120px 0;
+            background: #f8fafc;
+            text-align: center;
+        }
+        
+        .testimonial {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .testimonial blockquote {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #6366f1;
+        }
+        
+        .author-info h4 {
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        
+        .author-info p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        /* Integrations */
+        .integrations {
+            padding: 120px 0;
+            text-align: center;
+        }
+        
+        .integrations h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+        
+        .integrations p {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 60px;
+        }
+        
+        .integration-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .integration-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            transition: transform 0.3s;
+            margin: 0 auto;
+        }
+        
+        .integration-icon:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Video Section */
+        .video-section {
+            padding: 120px 0;
+            background: #f8fafc;
+            text-align: center;
+        }
+        
+        .video-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #1e293b;
+        }
+        
+        .video-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+        
+        .video-container iframe {
+            width: 100%;
+            height: 450px;
+            border: none;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #1e293b;
+            color: white;
+            padding: 80px 0 40px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-section a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #334155;
+            padding-top: 40px;
+            text-align: center;
+            color: #64748b;
+        }
+        
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .feature {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .feature:nth-child(even) .feature-content,
+            .feature:nth-child(even) .feature-image {
+                order: unset;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .integration-grid {
+                grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+                gap: 20px;
+            }
+            
+            .integration-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            
+            .video-container iframe {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo">Brandfolder</div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#resources">Resources</a></li>
+                <li><a href="#support">Support</a></li>
+            </ul>
+            <a href="#" class="cta-button">Get Started</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            @{
+                var heroTitle = Model.Value<string>("heroTitle");
+                var heroSubtitle = Model.Value<string>("heroSubtitle");
+                var heroDescription = Model.Value<string>("heroDescription");
+                var heroPrimaryButtonText = Model.Value<string>("heroPrimaryButtonText");
+                var heroPrimaryButtonLink = Model.Value<IPublishedContent>("heroPrimaryButtonLink");
+                var heroSecondaryButtonText = Model.Value<string>("heroSecondaryButtonText");
+                var heroSecondaryButtonLink = Model.Value<IPublishedContent>("heroSecondaryButtonLink");
+                var heroDashboardImage = Model.Value<IPublishedContent>("heroDashboardImage");
+            }
+            
+            @if (!string.IsNullOrEmpty(heroTitle))
+            {
+                <h1>@Html.Raw(heroTitle.Replace("\n", "<br>"))</h1>
+            }
+            
+            @if (!string.IsNullOrEmpty(heroSubtitle))
+            {
+                <h2>@heroSubtitle</h2>
+            }
+            
+            @if (!string.IsNullOrEmpty(heroDescription))
+            {
+                <p>@heroDescription</p>
+            }
+            
+            @if (!string.IsNullOrEmpty(heroPrimaryButtonText) || !string.IsNullOrEmpty(heroSecondaryButtonText))
+            {
+                <div class="hero-buttons">
+                    @if (!string.IsNullOrEmpty(heroPrimaryButtonText))
+                    {
+                        <a href="@(heroPrimaryButtonLink?.Url() ?? "#")" class="btn-primary">@heroPrimaryButtonText</a>
+                    }
+                    @if (!string.IsNullOrEmpty(heroSecondaryButtonText))
+                    {
+                        <a href="@(heroSecondaryButtonLink?.Url() ?? "#")" class="btn-secondary">@heroSecondaryButtonText</a>
+                    }
+                </div>
+            }
+            
+            @if (heroDashboardImage != null)
+            {
+                <div class="dashboard-preview">
+                    <img src="@heroDashboardImage.Url()" alt="Dashboard Preview" class="dashboard-image">
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- Brands Section -->
+    @{
+        var brandsSectionTitle = Model.Value<string>("brandsSectionTitle");
+        var brandLogo1Text = Model.Value<string>("brandLogo1Text");
+        var brandLogo2Text = Model.Value<string>("brandLogo2Text");
+        var brandLogo3Text = Model.Value<string>("brandLogo3Text");
+        var brandLogo4Text = Model.Value<string>("brandLogo4Text");
+        var brandLogo5Text = Model.Value<string>("brandLogo5Text");
+    }
+    
+    @if (!string.IsNullOrEmpty(brandsSectionTitle) || !string.IsNullOrEmpty(brandLogo1Text))
+    {
+        <section class="brands">
+            <div class="container">
+                @if (!string.IsNullOrEmpty(brandsSectionTitle))
+                {
+                    <h3>@brandsSectionTitle</h3>
+                }
+                <div class="brand-logos">
+                    @if (!string.IsNullOrEmpty(brandLogo1Text))
+                    {
+                        <div class="brand-logo">@brandLogo1Text</div>
+                    }
+                    @if (!string.IsNullOrEmpty(brandLogo2Text))
+                    {
+                        <div class="brand-logo">@brandLogo2Text</div>
+                    }
+                    @if (!string.IsNullOrEmpty(brandLogo3Text))
+                    {
+                        <div class="brand-logo">@brandLogo3Text</div>
+                    }
+                    @if (!string.IsNullOrEmpty(brandLogo4Text))
+                    {
+                        <div class="brand-logo">@brandLogo4Text</div>
+                    }
+                    @if (!string.IsNullOrEmpty(brandLogo5Text))
+                    {
+                        <div class="brand-logo">@brandLogo5Text</div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+
+    <!-- Features Section -->
+    @{
+        var feature1Title = Model.Value<string>("feature1Title");
+        var feature1Description = Model.Value<string>("feature1Description");
+        var feature1ButtonText = Model.Value<string>("feature1ButtonText");
+        var feature1ButtonLink = Model.Value<IPublishedContent>("feature1ButtonLink");
+        var feature1Image = Model.Value<IPublishedContent>("feature1Image");
+        
+        var feature2Title = Model.Value<string>("feature2Title");
+        var feature2Description = Model.Value<string>("feature2Description");
+        var feature2ButtonText = Model.Value<string>("feature2ButtonText");
+        var feature2ButtonLink = Model.Value<IPublishedContent>("feature2ButtonLink");
+        var feature2Image = Model.Value<IPublishedContent>("feature2Image");
+        
+        var feature3Title = Model.Value<string>("feature3Title");
+        var feature3Description = Model.Value<string>("feature3Description");
+        var feature3ButtonText = Model.Value<string>("feature3ButtonText");
+        var feature3ButtonLink = Model.Value<IPublishedContent>("feature3ButtonLink");
+        var feature3Image = Model.Value<IPublishedContent>("feature3Image");
+        
+        var feature4Title = Model.Value<string>("feature4Title");
+        var feature4Description = Model.Value<string>("feature4Description");
+        var feature4ButtonText = Model.Value<string>("feature4ButtonText");
+        var feature4ButtonLink = Model.Value<IPublishedContent>("feature4ButtonLink");
+        var feature4Image = Model.Value<IPublishedContent>("feature4Image");
+    }
+    
+    @if (!string.IsNullOrEmpty(feature1Title) || !string.IsNullOrEmpty(feature2Title) || !string.IsNullOrEmpty(feature3Title) || !string.IsNullOrEmpty(feature4Title))
+    {
+        <section class="features" id="features">
+            <div class="container">
+                @if (!string.IsNullOrEmpty(feature1Title))
+                {
+                    <div class="feature">
+                        <div class="feature-content">
+                            <h2>@feature1Title</h2>
+                            @if (!string.IsNullOrEmpty(feature1Description))
+                            {
+                                <p>@feature1Description</p>
+                            }
+                            @if (!string.IsNullOrEmpty(feature1ButtonText))
+                            {
+                                <a href="@(feature1ButtonLink?.Url() ?? "#")" class="btn-primary">@feature1ButtonText</a>
+                            }
+                        </div>
+                        @if (feature1Image != null)
+                        {
+                            <div class="feature-image">
+                                <img src="@feature1Image.Url()" alt="@feature1Title">
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(feature2Title))
+                {
+                    <div class="feature">
+                        <div class="feature-content">
+                            <h2>@feature2Title</h2>
+                            @if (!string.IsNullOrEmpty(feature2Description))
+                            {
+                                <p>@feature2Description</p>
+                            }
+                            @if (!string.IsNullOrEmpty(feature2ButtonText))
+                            {
+                                <a href="@(feature2ButtonLink?.Url() ?? "#")" class="btn-primary">@feature2ButtonText</a>
+                            }
+                        </div>
+                        @if (feature2Image != null)
+                        {
+                            <div class="feature-image">
+                                <img src="@feature2Image.Url()" alt="@feature2Title">
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(feature3Title))
+                {
+                    <div class="feature">
+                        <div class="feature-content">
+                            <h2>@feature3Title</h2>
+                            @if (!string.IsNullOrEmpty(feature3Description))
+                            {
+                                <p>@feature3Description</p>
+                            }
+                            @if (!string.IsNullOrEmpty(feature3ButtonText))
+                            {
+                                <a href="@(feature3ButtonLink?.Url() ?? "#")" class="btn-primary">@feature3ButtonText</a>
+                            }
+                        </div>
+                        @if (feature3Image != null)
+                        {
+                            <div class="feature-image">
+                                <img src="@feature3Image.Url()" alt="@feature3Title">
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(feature4Title))
+                {
+                    <div class="feature">
+                        <div class="feature-content">
+                            <h2>@feature4Title</h2>
+                            @if (!string.IsNullOrEmpty(feature4Description))
+                            {
+                                <p>@feature4Description</p>
+                            }
+                            @if (!string.IsNullOrEmpty(feature4ButtonText))
+                            {
+                                <a href="@(feature4ButtonLink?.Url() ?? "#")" class="btn-primary">@feature4ButtonText</a>
+                            }
+                        </div>
+                        @if (feature4Image != null)
+                        {
+                            <div class="feature-image">
+                                <img src="@feature4Image.Url()" alt="@feature4Title">
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- Integrations -->
+    @{
+        var integrationsTitle = Model.Value<string>("integrationsTitle");
+        var integrationsDescription = Model.Value<string>("integrationsDescription");
+        var integrationIcons = Model.Value<string>("integrationIcons");
+    }
+    
+    @if (!string.IsNullOrEmpty(integrationsTitle) || !string.IsNullOrEmpty(integrationIcons))
+    {
+        <section class="integrations">
+            <div class="container">
+                @if (!string.IsNullOrEmpty(integrationsTitle))
+                {
+                    <h2>@integrationsTitle</h2>
+                }
+                @if (!string.IsNullOrEmpty(integrationsDescription))
+                {
+                    <p>@integrationsDescription</p>
+                }
+                @if (!string.IsNullOrEmpty(integrationIcons))
+                {
+                    <div class="integration-grid">
+                        @{
+                            var icons = integrationIcons.Split(',');
+                            var colors = new string[] { "#ea4335", "#4285f4", "#7289da", "#e60023", "#ff0000", "#1da1f2", "#405de6", "#0077b5", "#ff6900", "#6f42c1", "#28a745", "#fd7e14" };
+                        }
+                        @for (int i = 0; i < icons.Length && i < colors.Length; i++)
+                        {
+                            <div class="integration-icon" style="background: @colors[i];">
+                                <i class="@icons[i].Trim()"></i>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- Video Section -->
+    @{
+        var videoSectionTitle = Model.Value<string>("videoSectionTitle");
+        var videoUrl = Model.Value<string>("videoUrl");
+        var videoTitle = Model.Value<string>("videoTitle");
+    }
+    
+    @if (!string.IsNullOrEmpty(videoSectionTitle) || !string.IsNullOrEmpty(videoUrl))
+    {
+        <section class="video-section">
+            <div class="container">
+                @if (!string.IsNullOrEmpty(videoSectionTitle))
+                {
+                    <h2>@videoSectionTitle</h2>
+                }
+                @if (!string.IsNullOrEmpty(videoUrl))
+                {
+                    <div class="video-container">
+                        <iframe src="@videoUrl" 
+                                title="@(string.IsNullOrEmpty(videoTitle) ? "Video" : videoTitle)" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- Testimonials -->
+    @{
+        var testimonialQuote = Model.Value<string>("testimonialQuote");
+        var testimonialAuthorName = Model.Value<string>("testimonialAuthorName");
+        var testimonialAuthorTitle = Model.Value<string>("testimonialAuthorTitle");
+        var testimonialAuthorCompany = Model.Value<string>("testimonialAuthorCompany");
+        var testimonialAuthorAvatar = Model.Value<IPublishedContent>("testimonialAuthorAvatar");
+    }
+    
+    @if (!string.IsNullOrEmpty(testimonialQuote))
+    {
+        <section class="testimonials">
+            <div class="container">
+                <div class="testimonial">
+                    <blockquote>"@testimonialQuote"</blockquote>
+                    @if (!string.IsNullOrEmpty(testimonialAuthorName))
+                    {
+                        <div class="testimonial-author">
+                            @if (testimonialAuthorAvatar != null)
+                            {
+                                <img src="@testimonialAuthorAvatar.Url()" alt="@testimonialAuthorName" class="author-avatar">
+                            }
+                            else
+                            {
+                                <div class="author-avatar"></div>
+                            }
+                            <div class="author-info">
+                                <h4>@testimonialAuthorName</h4>
+                                @if (!string.IsNullOrEmpty(testimonialAuthorTitle) || !string.IsNullOrEmpty(testimonialAuthorCompany))
+                                {
+                                    <p>@testimonialAuthorTitle@(string.IsNullOrEmpty(testimonialAuthorTitle) || string.IsNullOrEmpty(testimonialAuthorCompany) ? "" : ", ")@testimonialAuthorCompany</p>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Product</h3>
+                    <ul>
+                        <li><a href="#">Digital Asset Management</a></li>
+                        <li><a href="#">Brand Intelligence</a></li>
+                        <li><a href="#">Creative Workflow</a></li>
+                        <li><a href="#">Integrations</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Webinars</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Press</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Support</a></li>
+                        <li><a href="#">System Status</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Brandfolder. All rights reserved. | Privacy Policy | Terms of Service</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all feature sections
+        document.querySelectorAll('.feature').forEach(feature => {
+            feature.style.opacity = '0';
+            feature.style.transform = 'translateY(30px)';
+            feature.style.transition = 'all 0.6s ease';
+            observer.observe(feature);
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
